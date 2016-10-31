@@ -13,7 +13,7 @@ corpus = [
           "Authman ran faster than Harry because he is an athlete.",
           "Authman and Harry ran faster and faster."]
 
-bow = CountVectorizer()  # Bag Of Words
+bow = CountVectorizer(ngram_range=(2,3))  # Bag Of Words
 X = bow.fit_transform(corpus)  # Sparse Matrix
 print(bow.get_feature_names())
 print('\n', X)
