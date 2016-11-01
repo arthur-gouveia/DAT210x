@@ -48,3 +48,5 @@ Temporary Items
 
 #Spyder project file
 .spyderproject
+.spyproject/workspace.ini
+.spyproject/workspace.ini
