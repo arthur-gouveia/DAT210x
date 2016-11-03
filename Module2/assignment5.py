@@ -44,7 +44,8 @@ for col in str_cols:
                                                          value_counts()))
 
 # Things that called my attentions:
-#   1 - 51 people declared 'Preschool' as education level
+#   1 - 51 people declared 'Preschool' as education level (This MUST be wrong,
+#       so I set it to NaN at read_csv)
 #   2 - min and max hours per week: 1 and 99
 #   3 - max capital-gain: 99999
 #   4 - ages == 90
