@@ -50,3 +50,4 @@ Temporary Items
 .spyderproject
 .spyproject/workspace.ini
 .spyproject/workspace.ini
+*.ini

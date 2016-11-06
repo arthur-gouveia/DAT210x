@@ -13,6 +13,16 @@ import pandas as pd
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 
+MENU = '''
+1: Single Histogram
+2: Multiple Histogram
+3: Scatter plot
+4: 3D Scatter plot
+5: Parallel Plot
+
+Enter your choice:
+'''
+
 
 def histplot(data, **kwargs):
     data.plot.hist(**kwargs)
@@ -34,15 +44,26 @@ def scatter3D(data, **kwargs):
     mpl.pyplot.show()
 
 
-mpl.style.use('ggplot')
-mpl.cm.cmapname = 'gray'
+def menu():
+    return int(input(MENU))
 
-student_dataset = pd.read_csv("Datasets/students.data", index_col=0)
 
-histplot(student_dataset.G3, alpha=0.5, normed=True)
-histplot(student_dataset[['G3', 'G2', 'G1']], alpha=0.5)
+if __name__ == '__main__':
+    mpl.style.use('ggplot')
+    mpl.cm.cmapname = 'gray'
 
-scatter2D(student_dataset[['G1', 'G3']], x='G1', y='G3')
+    student_dataset = pd.read_csv("Datasets/students.data", index_col=0)
 
-scatter3D([student_dataset.G1, student_dataset.G3,
-           student_dataset['Dalc']], c='r', marker='o')
+    choice = menu()
+
+    if choice == 1:
+        histplot(student_dataset.G3, alpha=0.5, normed=True)
+    elif choice == 2:
+        histplot(student_dataset[['G3', 'G2', 'G1']], alpha=0.5)
+    elif choice == 3:
+        scatter2D(student_dataset[['G1', 'G3']], x='G1', y='G3')
+    elif choice == 4:
+        scatter3D([student_dataset.G1, student_dataset.G3,
+                   student_dataset['Dalc']], c='r', marker='o')
+    else:
+        print('Invalid option. Try again')
