@@ -9,6 +9,9 @@ http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.hist
 
 @author: Arthur Gouveia
 """
+import pandas as pd
+import matplotlib as mpl
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def histplot(data, **kwargs):
@@ -30,10 +33,6 @@ def scatter3D(data, **kwargs):
                data[2], **kwargs)
     mpl.pyplot.show()
 
-
-import pandas as pd
-import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
 
 mpl.style.use('ggplot')
 mpl.cm.cmapname = 'gray'
