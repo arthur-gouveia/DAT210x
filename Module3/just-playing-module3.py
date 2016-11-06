@@ -2,13 +2,34 @@
 """
 Created on Fri Nov  4 13:18:57 2016
 
-Module 4 on DAT210x course scripts
+Module 3 on DAT210x course scripts
 
 More info on matplotlib histogram:
 http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.hist
 
 @author: Arthur Gouveia
 """
+
+
+def histplot(data, *kwargs):
+    data.plot.hist(*kwargs)
+
+
+def 2Dscatter(data, x, y, *kwargs):
+    data.plot.scatter(x=x, y=y, *kwargs)
+
+
+def 3Dscatter(data, *kwargs):
+    fig = mpl.pyplot.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_xlabel('Final Grade')
+    ax.set_ylabel('First Grade')
+    ax.set_zlabel('Daily Alcohol')
+
+    ax.scatter(data[0], data[1],
+               data[2], *kwargs)
+    mpl.pyplot.show()
+
 
 import pandas as pd
 import matplotlib as mpl
@@ -19,11 +40,8 @@ mpl.cm.cmapname = 'gray'
 
 student_dataset = pd.read_csv("Datasets/students.data", index_col=0)
 
-my_series = student_dataset.G3
-my_dataframe = student_dataset[['G3', 'G2', 'G1']]
-
-my_series.plot.hist(alpha=0.5, normed=True)
-my_dataframe.plot.hist(alpha=0.5)
+histpot(student_dataset.G3, alpha=0.5, normed=True)
+histpot(student_dataset[['G3', 'G2', 'G1']], alpha=0.5)
 
 student_dataset[['G1', 'G3']].plot.scatter(x='G1', y='G3')
 
