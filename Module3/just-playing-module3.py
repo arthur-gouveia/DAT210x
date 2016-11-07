@@ -12,6 +12,8 @@ http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.hist
 import pandas as pd
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
+from pandas.tools.plotting import parallel_coordinates
+from sklearn.datasets import load_iris
 
 MENU = '''
 1: Single Histogram
@@ -45,7 +47,7 @@ def scatter3D(data, **kwargs):
 
 
 def menu():
-    return int(input(MENU))
+    return input(MENU)
 
 
 if __name__ == '__main__':
@@ -53,17 +55,22 @@ if __name__ == '__main__':
     mpl.cm.cmapname = 'gray'
 
     student_dataset = pd.read_csv("Datasets/students.data", index_col=0)
+    data = load_iris()
+    iris = pd.DataFrame(data.data, columns=data.feature_names)
+    iris['target_names'] = [data.target_names[i] for i in data.target]
 
     choice = menu()
 
-    if choice == 1:
+    if choice == '1':
         histplot(student_dataset.G3, alpha=0.5, normed=True)
-    elif choice == 2:
+    elif choice == '2':
         histplot(student_dataset[['G3', 'G2', 'G1']], alpha=0.5)
-    elif choice == 3:
+    elif choice == '3':
         scatter2D(student_dataset[['G1', 'G3']], x='G1', y='G3')
-    elif choice == 4:
+    elif choice == '4':
         scatter3D([student_dataset.G1, student_dataset.G3,
                    student_dataset['Dalc']], c='r', marker='o')
+    elif choice == '5':
+        parallel_coordinates(iris, 'target_names')
     else:
         print('Invalid option. Try again')
