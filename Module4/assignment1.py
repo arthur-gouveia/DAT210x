@@ -5,7 +5,7 @@ import datetime
 
 from mpl_toolkits.mplot3d import Axes3D
 from plyfile import PlyData, PlyElement
-from sklearn.decomposition import RandomizedPCA, PCA
+from sklearn.decomposition import PCA
 
 
 # Every 100 data samples, we save 1. If things run too
@@ -60,7 +60,7 @@ def do_RandomizedPCA(armadillo):
     #
     # .. your code here ..
 
-    T = RandomizedPCA(2).fit_transform(armadillo)
+    T = PCA(2, svd_solver='randomized').fit_transform(armadillo)
 
     return T
 
