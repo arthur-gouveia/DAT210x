@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
+import seaborn as sns
 
 matplotlib.style.use('seaborn-dark')
 #
@@ -38,3 +39,7 @@ plt.xticks(tick_marks, df.columns[:7], rotation='vertical')
 plt.yticks(tick_marks, df.columns[:7])
 
 plt.show()
+
+# One WAY EASIER alternative is to use seaborn
+plt.figure()
+sns.heatmap(cormatrix, annot=True)
