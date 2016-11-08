@@ -51,3 +51,4 @@ Temporary Items
 .spyproject/workspace.ini
 .spyproject/workspace.ini
 *.ini
+*.pyc
