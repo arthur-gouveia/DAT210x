@@ -8,6 +8,11 @@ import sys
 # Look pretty...
 matplotlib.style.use('ggplot')
 
+# Numerical and Categorical columns
+num_cols = ['age', 'bp', 'sg', 'al', 'su', 'bgr', 'bu', 'sc', 'sod', 'pot',
+            'hemo', 'pcv', 'wc', 'rc']
+cat_cols = ['classification', 'rbc', 'pc', 'pcc', 'ba', 'htn', 'dm', 'cad',
+            'appet', 'pe', 'ane']
 
 # You can set scaleFeatures to True by passing -s as a parameter to the script
 if (len(sys.argv) == 2) and (sys.argv[1] == '-s'):
@@ -21,33 +26,27 @@ else:
 #
 df = pd.read_csv('Datasets/kidney_disease.csv', index_col=0)
 df.dropna(inplace=True)
-
+df = df.reset_index(drop=True)
 
 # Create some color coded labels; the actual label feature
 # will be removed prior to executing PCA, since it's unsupervised.
 # You're only labeling by color so you can see the effects of PCA
 labels = ['red' if i == 'ckd' else 'green' for i in df.classification]
+df.drop('classification', axis=1, inplace=True)
 
-
-# TODO: Use an indexer to select only the following columns:
-#       ['bgr','wc','rc']
+# Make sure that any Object column is coerced to numeric
 #
-df = df[['bgr', 'wc', 'rc']]
+for col in num_cols:
+    if df[col].dtype == 'O':
+        df[col] = pd.to_numeric(df[col], errors='coerce')
 
 
-# TODO: Print out and check your dataframe's dtypes. You'll probably
-# want to call 'exit()' after you print it out so you can stop the
-# program's execution.
-#
-# You can either take a look at the dataset webpage in the attribute info
-# section: https://archive.ics.uci.edu/ml/datasets/Chronic_Kidney_Disease
-# or you can actually peek through the dataframe by printing a few rows.
-# What kind of data type should these three columns be? If Pandas didn't
-# properly detect and convert them to that data type for you, then use
-# an appropriate command to coerce these features into the right type.
-#
-df['wc'] = pd.to_numeric(df['wc'], errors='coerce')
-df['rc'] = pd.to_numeric(df['rc'], errors='coerce')
+# Change the categorical columns to dummy
+df = pd.get_dummies(df)
+# Comment the line above and uncomment the line below to see the effect of
+# not using dummy variables to discriminate the results
+# To see clearly the efect use the -s parameter to scale the variables
+# df.drop(cat_cols[1:], axis=1, inplace=True)
 
 
 # TODO: PCA Operates based on variance. The variable with the greatest
