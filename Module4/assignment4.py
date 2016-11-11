@@ -75,7 +75,14 @@ Plot2D(iso_t, 'ISO T1 x T2', 1, 2)
 # TODO: If you're up for a challenge, draw your dataframes in 3D
 # Even if you're not, just do it anyway.
 #
-# .. your code here ..
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.set_title('Isomap 3D')
+ax.set_xlabel('Component 0')
+ax.set_ylabel('Component 1')
+ax.set_zlabel('Component 2')
+ax.scatter(iso_t[:, 0], iso_t[:, 1], iso_t[:, 2],
+           c='green', marker='.', alpha=0.75)
 
 
 plt.show()
