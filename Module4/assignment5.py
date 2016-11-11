@@ -14,9 +14,11 @@ matplotlib.style.use('ggplot')
 # TODO: Start by creating a regular old, plain, "vanilla"
 # python list. You can call it 'samples'.
 #
+# No need to create this empty list. I'll build it with listcomp
 root = 'Datasets/ALOI/32/'
-
-samples = [misc.imread(root+file).reshape(-1) for file in os.listdir(root)]
+root_i = 'Datasets/ALOI/32i/'
+files = os.listdir(root)
+files_i = os.listdir(root_i)
 
 
 #
@@ -31,7 +33,8 @@ samples = [misc.imread(root+file).reshape(-1) for file in os.listdir(root)]
 # 0-255  to  0.0-1.0  if you'd like, but that will have no
 # effect on the algorithm's results.
 #
-# .. your code here .. 
+samples = [misc.imread(root+file).reshape(-1) for file in files]
+colors = ['b' for file in files]
 
 
 #
@@ -41,7 +44,8 @@ samples = [misc.imread(root+file).reshape(-1) for file in os.listdir(root)]
 # in the Module4/Datasets/ALOI/32_i directory. Re-run your
 # assignment and answer the final question below.
 #
-# .. your code here .. 
+samples += [misc.imread(root_i+file).reshape(-1) for file in files_i]
+colors += ['r' for file in files_i]
 
 
 #
@@ -62,7 +66,7 @@ iso_t = manifold.Isomap(n_neighbors=6, n_components=3).fit_transform(df)
 # can use either 'o' or '.' as your marker. Graph the first two
 # isomap components
 #
-plt.scatter(iso_t[:, 0], iso_t[:, 1])
+plt.scatter(iso_t[:, 0], iso_t[:, 1], c=colors)
 
 
 #
@@ -76,10 +80,7 @@ ax.set_xlabel('Component 0')
 ax.set_ylabel('Component 1')
 ax.set_zlabel('Component 2')
 ax.scatter(iso_t[:, 0], iso_t[:, 1], iso_t[:, 2],
-           c='green', marker='.', alpha=0.75)
-
-
+           c=colors, marker='.', alpha=0.75)
 
 
 plt.show()
-
