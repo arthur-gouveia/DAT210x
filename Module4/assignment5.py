@@ -1,5 +1,6 @@
 import pandas as pd
-
+import os
+from sklearn import manifold
 from scipy import misc
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
@@ -13,7 +14,10 @@ matplotlib.style.use('ggplot')
 # TODO: Start by creating a regular old, plain, "vanilla"
 # python list. You can call it 'samples'.
 #
-# .. your code here .. 
+root = 'Datasets/ALOI/32/'
+
+samples = [misc.imread(root+file).reshape(-1) for file in os.listdir(root)]
+
 
 #
 # TODO: Write a for-loop that iterates over the images in the
@@ -43,16 +47,14 @@ matplotlib.style.use('ggplot')
 #
 # TODO: Convert the list to a dataframe
 #
-# .. your code here .. 
-
+df = pd.DataFrame(samples)
 
 
 #
 # TODO: Implement Isomap here. Reduce the dataframe df down
 # to three components, using K=6 for your neighborhood size
 #
-# .. your code here .. 
-
+iso_t = manifold.Isomap(n_neighbors=6, n_components=3).fit_transform(df)
 
 
 #
@@ -60,16 +62,22 @@ matplotlib.style.use('ggplot')
 # can use either 'o' or '.' as your marker. Graph the first two
 # isomap components
 #
-# .. your code here .. 
-
-
+plt.scatter(iso_t[:, 0], iso_t[:, 1])
 
 
 #
 # TODO: Create a 3D Scatter plot to graph your manifold. You
 # can use either 'o' or '.' as your marker:
 #
-# .. your code here .. 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.set_title('Isomap 3D')
+ax.set_xlabel('Component 0')
+ax.set_ylabel('Component 1')
+ax.set_zlabel('Component 2')
+ax.scatter(iso_t[:, 0], iso_t[:, 1], iso_t[:, 2],
+           c='green', marker='.', alpha=0.75)
+
 
 
 
