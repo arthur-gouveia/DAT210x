@@ -4,6 +4,7 @@ import scipy.io
 import random
 import math
 from sklearn.decomposition import PCA
+from sklearn import manifold
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
@@ -54,10 +55,10 @@ for i in range(num_images):
 # x is the principal component you want displayed on the x-axis, Can be 0 or 1
 # y is the principal component you want displayed on the y-axis, Can be 1 or 2
 #
-T = PCA(3).fit_transform(df)
-Plot2D(T, 'T0 x T1', 0, 1)
-Plot2D(T, 'T1 x T2', 1, 2)
-Plot2D(T, 'T0 x T2', 0, 2)
+pca_t = PCA(3).fit_transform(df)
+Plot2D(pca_t, 'PCA T0 x T1', 0, 1)
+Plot2D(pca_t, 'PCA T1 x T2', 1, 2)
+Plot2D(pca_t, 'PCA T0 x T2', 0, 2)
 
 
 #
@@ -65,8 +66,10 @@ Plot2D(T, 'T0 x T2', 0, 2)
 # to THREE components. Once you've done that, call Plot2D using
 # the first two components.
 #
-# .. your code here ..
 
+iso_t = manifold.Isomap(n_neighbors=8, n_components=3).fit_transform(df)
+Plot2D(iso_t, 'ISO T0 x T1', 0, 1)
+Plot2D(iso_t, 'ISO T1 x T2', 1, 2)
 
 #
 # TODO: If you're up for a challenge, draw your dataframes in 3D
