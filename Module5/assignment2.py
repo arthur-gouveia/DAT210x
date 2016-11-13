@@ -1,5 +1,5 @@
 import pandas as pd
-
+from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -22,15 +22,18 @@ def showandtell(title=None):
 # TODO: Load up the dataset and take a peek at its head
 # Convert the date using pd.to_datetime, and the time using pd.to_timedelta
 #
-# .. your code here ..
+cdr = pd.read_csv('Datasets/CDR.csv')
+cdr.CallDate = pd.to_datetime(cdr.CallDate)
+cdr.CallTime = pd.to_timedelta(cdr.CallTime)
 
 
 #
 # TODO: Get a distinct list of "In" phone numbers (users) and store the values
 # in a regular python list.
-# Hint: docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tolist.html
+# Hint:
+# https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tolist.html
 #
-# .. your code here ..
+unique_in = cdr.In.unique().tolist()
 
 
 #
@@ -38,11 +41,12 @@ def showandtell(title=None):
 # records where the "In" feature (user phone number) is equal to the first
 # number on your unique list above
 #
-# .. your code here ..
+user1 = cdr[cdr.In == unique_in[0]]
 
 
 # INFO: Plot all the call locations
-user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call Locations')
+user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1,
+                   title='Call Locations')
 # showandtell()  # Comment this line out when you're ready to proceed
 
 
@@ -51,7 +55,7 @@ user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call 
 # around. This is where domain expertise comes into play. Your intuition tells
 # you that people are likely to behave differently on weekends:
 #
-# On Weekdays:
+# On Weekends:
 #   1. People probably don't go into work
 #   2. They probably sleep in late on Saturday
 #   3. They probably run a bunch of random errands, since they couldn't during
@@ -68,7 +72,7 @@ user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call 
 # TODO: Add more filters to the user1 slice you created. Add bitwise logic so
 # that you're only examining records that came in on weekends (sat/sun).
 #
-# .. your code here ..
+user1 = user1[(user1.DOW == 'Sat') | (user1.DOW == 'Sun')]
 
 
 #
@@ -81,8 +85,8 @@ user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call 
 # You might also want to review the Data Manipulation section for this. Once
 # you have your filtered slice, print out its length:
 #
-# .. your code here ..
-
+user1 = user1[(user1.CallTime > '22:00:00') | (user1.CallTime < '06:00:00')]
+print(len(user1))
 
 #
 # INFO: Visualize the dataframe with a scatter plot as a sanity check. Since
@@ -97,7 +101,7 @@ user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call 
 # wherever they are bunched up is probably near where the caller's residence:
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.scatter(user1.TowerLon,user1.TowerLat, c='g', marker='o', alpha=0.2)
+ax.scatter(user1.TowerLon, user1.TowerLat, c='g', marker='o', alpha=0.2)
 ax.set_title('Weekend Calls (<6am or >10p)')
 # showandtell()  # TODO: Comment this line out when you're ready to proceed
 
@@ -119,7 +123,12 @@ ax.set_title('Weekend Calls (<6am or >10p)')
 # Hint: Make sure you graph the CORRECT coordinates. This is part of your
 # domain expertise.
 #
-# .. your code here ..
+kmeans_model = KMeans(2, tol=1e-12)
+kmeans_model.fit(cdr[['TowerLon', 'TowerLat']])
+centroids = kmeans_model.cluster_centers_
+print(centroids)
+ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', c='r', alpha=0.5,
+           linewidths=3, s=169)
 
 
 # showandtell()  # TODO: Comment this line out when you're ready to proceed
