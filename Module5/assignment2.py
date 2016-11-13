@@ -10,7 +10,7 @@ def showandtell(title=None):
     if title is not None:
         plt.savefig(title + ".png", bbox_inches='tight', dpi=300)
     plt.show()
-    exit()
+#    exit()
 
 
 #
@@ -43,11 +43,10 @@ unique_in = cdr.In.unique().tolist()
 #
 user1 = cdr[cdr.In == unique_in[0]]
 
-
 # INFO: Plot all the call locations
 user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1,
                    title='Call Locations')
-# showandtell()  # Comment this line out when you're ready to proceed
+showandtell()  # Comment this line out when you're ready to proceed
 
 
 #
@@ -103,7 +102,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.scatter(user1.TowerLon, user1.TowerLat, c='g', marker='o', alpha=0.2)
 ax.set_title('Weekend Calls (<6am or >10p)')
-# showandtell()  # TODO: Comment this line out when you're ready to proceed
+showandtell()  # TODO: Comment this line out when you're ready to proceed
 
 
 #
@@ -129,9 +128,7 @@ centroids = kmeans_model.cluster_centers_
 print(centroids)
 ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', c='r', alpha=0.5,
            linewidths=3, s=169)
-
-
-# showandtell()  # TODO: Comment this line out when you're ready to proceed
+showandtell()  # TODO: Comment this line out when you're ready to proceed
 
 
 #
@@ -139,4 +136,26 @@ ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', c='r', alpha=0.5,
 # their approximate home locations. You might want to use a for-loop, unless
 # you enjoy typing.
 #
-# .. your code here ..
+for phone in unique_in[1:]:
+    user1 = cdr[cdr.In == phone]
+    # INFO: Plot all the call locations
+    user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1,
+                       title='Call Locations')
+#    showandtell('Call Locations ', phone)
+    user1 = user1[(user1.DOW == 'Sat') | (user1.DOW == 'Sun')]
+    user1 = user1[(user1.CallTime > '22:00:00') |
+                  (user1.CallTime < '06:00:00')]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(user1.TowerLon, user1.TowerLat, c='g', marker='o', alpha=0.2)
+    ax.set_title('Weekend Calls (<6am or >10p)')
+#    showandtell('Weekend Calls (<6am or >10p)', phone)
+
+    kmeans_model = KMeans(2, tol=1e-12)
+    kmeans_model.fit(cdr[['TowerLon', 'TowerLat']])
+    centroids = kmeans_model.cluster_centers_
+    print(centroids)
+    ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', c='r', alpha=0.5,
+               linewidths=3, s=169)
+#    showandtell('Centroids')
