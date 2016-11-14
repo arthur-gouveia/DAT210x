@@ -2,6 +2,7 @@ import pandas as pd
 from datetime import timedelta
 import matplotlib.pyplot as plt
 import matplotlib
+from sklearn.cluster import KMeans
 
 matplotlib.style.use('ggplot') # Look Pretty
 
@@ -50,7 +51,9 @@ def doKMeans(data, clusters=0):
     # Hint: Make sure you fit ONLY the coordinates, and in the CORRECT order
     # (lat first). This is part of your domain expertise.
     #
-    # .. your code here ..
+    model = KMeans(clusters)
+    model.fit(data[['TowerLat', 'TowerLon']])
+
     return model
 
 
@@ -58,7 +61,10 @@ def doKMeans(data, clusters=0):
 # TODO: Load up the dataset and take a peek at its head and dtypes.
 # Convert the date using pd.to_datetime, and the time using pd.to_timedelta
 #
-# .. your code here ..
+cdr = pd.read_csv('Datasets/CDR.csv')
+cdr.CallDate = pd.to_datetime(cdr.CallDate)
+cdr.CallTime = pd.to_timedelta(cdr.CallTime)
+cdr.Duration = pd.to_timedelta(cdr.Duration)
 
 
 #
@@ -67,7 +73,7 @@ def doKMeans(data, clusters=0):
 # Hint:
 # https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tolist.html
 #
-# .. your code here ..
+unique_in = cdr.In.unique().tolist()
 
 
 #
@@ -78,7 +84,8 @@ def doKMeans(data, clusters=0):
 # On Weekends:
 #   1. People probably don't go into work
 #   2. They probably sleep in late on Saturday
-#   3. They probably run a bunch of random errands, since they couldn't during the week
+#   3. They probably run a bunch of random errands, since they couldn't during
+#      the week
 #   4. They should be home, at least during the very late hours, e.g. 1-4 AM
 #
 # On Weekdays:
@@ -88,19 +95,17 @@ def doKMeans(data, clusters=0):
 
 
 print("\n\nExamining person: ", 0)
-# 
+#
 # TODO: Create a slice called user1 that filters to only include dataset
 # records where the "In" feature (user phone number) is equal to the first
 # number on your unique list above
 #
-# .. your code here ..
-
+user1 = cdr[cdr.In == unique_in[0]]
 
 #
 # TODO: Alter your slice so that it includes only Weekday (Mon-Fri) values.
 #
-# .. your code here ..
-
+cdr = cdr[(cdr.DOW != 'Sun') & (cdr.DOW != 'Sat')]
 
 #
 # TODO: The idea is that the call was placed before 5pm. From Midnight-730a,
@@ -109,13 +114,15 @@ print("\n\nExamining person: ", 0)
 # they'll spend the entire day at work. So the assumption is that most of the
 # time is spent either at work, or in 2nd, at home.
 #
-# .. your code here ..
+cdr = cdr[cdr.CallTime < '17:00:00']
 
 
 #
 # TODO: Plot the Cell Towers the user connected to
 #
-# .. your code here ..
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.scatter(user1.TowerLat, user1.TowerLon, alpha=0.5, c='g')
 
 
 #
@@ -126,7 +133,13 @@ print("\n\nExamining person: ", 0)
 # the annoying outliers and not-home, not-work travel occasions. the other two
 # will zero in on the user's approximate home location and work locations. Or
 # rather the location of the cell tower closest to them.....
-model = doKMeans(user1, 3)
+model = doKMeans(user1, 4)
+print(model.cluster_centers_)
+ax.scatter(model.cluster_centers_[:, 0], model.cluster_centers_[:, 1],
+           marker='x', s=169, color='r', linewidths=3, alpha=0.5)
+
+#colors = ['green', 'pink', 'blue']
+#labels = [colors[i] for i in model.labels_]
 
 
 #
@@ -144,9 +157,9 @@ print("    Its Waypoint Time: ", midWaySamples.CallTime.mean())
 #
 # Let's visualize the results!
 # First draw the X's for the clusters:
-ax.scatter(model.cluster_centers_[:, 1], model.cluster_centers_[:, 0], s=169,
-           c='r', marker='x', alpha=0.8, linewidths=2)
+#ax.scatter(model.cluster_centers_[:, 1], model.cluster_centers_[:, 0], s=169,
+#           c='r', marker='x', alpha=0.5, linewidths=2)
 #
 # Then save the results:
 # Comment the line below out when you're ready to proceed
-showandtell('Weekday Calls Centroids')
+# showandtell('Weekday Calls Centroids')
