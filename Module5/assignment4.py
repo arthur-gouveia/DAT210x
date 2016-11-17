@@ -1,16 +1,16 @@
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-
+from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import matplotlib
-
+import seaborn as sns
 
 #
 # TODO: Parameters to play around with
 PLOT_TYPE_TEXT = False    # If you'd like to see indices
 PLOT_VECTORS = True       # If you'd like to see your original features in P.C.-Space
-
+PLOT_HIST_BOXPLOT = True
 
 matplotlib.style.use('ggplot') # Look Pretty
 c = ['red', 'green', 'blue', 'orange', 'yellow', 'brown']
@@ -35,7 +35,7 @@ def drawVectors(transformed_features, components_, columns, plt):
   import math
   important_features = { columns[i] : math.sqrt(xvector[i]**2 + yvector[i]**2) for i in range(num_columns) }
   important_features = sorted(zip(important_features.values(), important_features.keys()), reverse=True)
-  print "Projected Features by importance:\n", important_features
+  print("Projected Features by importance:\n", important_features)
 
   ax = plt.axes()
 
@@ -48,8 +48,8 @@ def drawVectors(transformed_features, components_, columns, plt):
     
 
 def doPCA(data, dimensions=2):
-  from sklearn.decomposition import RandomizedPCA
-  model = RandomizedPCA(n_components=dimensions)
+  from sklearn.decomposition import PCA
+  model = PCA(n_components=dimensions, svd_solver='randomized')
   model.fit(data)
   return model
 
@@ -60,7 +60,8 @@ def doKMeans(data, clusters=0):
   # and fit it against your data. Then, return a tuple containing the cluster
   # centers and the labels
   #
-  # .. your code here ..
+  model = KMeans(clusters)
+  model.fit(data)
   return model.cluster_centers_, model.labels_
 
 
@@ -70,7 +71,15 @@ def doKMeans(data, clusters=0):
 # for this dataset, since if the value is missing, you can assume no $ was spent
 # on it.
 #
-# .. your code here ..
+df = pd.read_csv('Datasets/Wholesale customers data.csv')
+nulls = df.isnull().sum()
+print('Number of missing values')
+print(nulls)
+if nulls.sum() > 0:
+    df.fillna(0)
+    print('{} missing values were replaced'.format(nulls.sum()))
+    print('This are the new numbers of missing values: \n{}'.format(
+          df.isnull.sum()))
 
 #
 # TODO: As instructed, get rid of the 'Channel' and 'Region' columns, since
@@ -78,7 +87,7 @@ def doKMeans(data, clusters=0):
 # than a national / international one. Leaving these fields in here would cause
 # KMeans to examine and give weight to them.
 #
-# .. your code here ..
+df = df.ix[:, 2:]
 
 
 #
@@ -86,8 +95,14 @@ def doKMeans(data, clusters=0):
 # K-Means, it's a good idea to get a quick peek at it. You can do this using the
 # .describe() method, or even by using the built-in pandas df.plot.hist()
 #
-# .. your code here ..
-
+print(df.describe())
+if (PLOT_HIST_BOXPLOT):
+    df.hist()
+    plt.suptitle('Histogram of original data')
+    
+    plt.figure()
+    sns.boxplot(data=df)
+    plt.suptitle('Boxplot of original data')
 
 #
 # INFO: Having checked out your data, you may have noticed there's a pretty big gap
@@ -99,7 +114,7 @@ def doKMeans(data, clusters=0):
 # interested in clustering your +/- 2 standard deviation customers, rather than the
 # creme dela creme, or bottom of the barrel'ers
 #
-# Remove top 5 and bottom 5 samples for each column:
+# Remove top 10 and bottom 5 samples for each column:
 drop = {}
 for col in df.columns:
   # Bottom 5
@@ -109,7 +124,7 @@ for col in df.columns:
 
   # Top 5
   sort = df.sort_values(by=col, ascending=False)
-  if len(sort) > 5: sort=sort[:5]
+  if len(sort) > 10: sort=sort[:10]
   for index in sort.index: drop[index] = True # Just store the index once
 
 #
@@ -118,10 +133,18 @@ for col in df.columns:
 # to, if there is a single row that satisfies the drop for multiple columns.
 # Since there are 6 rows, if we end up dropping < 5*6*2 = 60 rows, that means
 # there indeed were collisions.
-print "Dropping {0} Outliers...".format(len(drop))
+print("Dropping {0} Outliers...".format(len(drop)))
 df.drop(inplace=True, labels=drop.keys(), axis=0)
-print df.describe()
 
+print(df.describe())
+
+if (PLOT_HIST_BOXPLOT):
+    df.hist()
+    plt.suptitle('After outlier removal')
+    
+    plt.figure()
+    sns.boxplot(data=df)
+    plt.suptitle('After outlier removal')
 
 #
 # INFO: What are you interested in?
@@ -176,7 +199,15 @@ print df.describe()
 #T = preprocessing.MinMaxScaler().fit_transform(df)
 #T = preprocessing.MaxAbsScaler().fit_transform(df)
 #T = preprocessing.Normalizer().fit_transform(df)
-T = df # No Change
+#T = df # No Change
+scalers = {'Standard': preprocessing.StandardScaler,
+           'MinMax': preprocessing.MinMaxScaler,
+           'MaxAbs': preprocessing.MaxAbsScaler,
+           'Normalizer': preprocessing.Normalizer}
+
+actual_scaler = 'Normalizer'
+T = scalers[actual_scaler]().fit_transform(df)
+
 
 
 #
@@ -195,10 +226,10 @@ centroids, labels = doKMeans(T, n_clusters)
 
 
 #
-# TODO: Print out your centroids. They're currently in feature-space, which
-# is good. Print them out before you transform them into PCA space for viewing
+# TODO: print out your centroids. They're currently in feature-space, which
+# is good. print them out before you transform them into PCA space for viewing
 #
-# .. your code here ..
+print('Centroids values:\n{}'.format(centroids))
 
 
 # Do PCA *after* to visualize the results. Project the centroids as well as 
@@ -233,6 +264,7 @@ if PLOT_VECTORS: drawVectors(T, display_pca.components_, df.columns, plt)
 
 # Add the cluster label back into the dataframe and display it:
 df['label'] = pd.Series(labels, index=df.index)
-print df
+print(df)
 
 plt.show()
+plt.suptitle(actual_scaler)
