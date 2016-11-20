@@ -100,7 +100,7 @@ for phone in unique_in:
 # wherever they are bunched up is probably near where the caller's residence:
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.scatter(user1.TowerLon, user1.TowerLat, c='g', marker='o', alpha=0.2)
+    ax.scatter(user1.TowerLon, user1.TowerLat, c='g', marker='o', alpha=0.5)
     ax.set_title('Weekend Calls (<6am or >10p)')
 #    showandtell('Weekend Calls (<6am or >10p)', phone)
 
@@ -121,10 +121,10 @@ for phone in unique_in:
 # Hint: Make sure you graph the CORRECT coordinates. This is part of your
 # domain expertise.
 #
-    kmeans_model = KMeans(2, tol=1e-12)
-    kmeans_model.fit(cdr[['TowerLon', 'TowerLat']])
+    kmeans_model = KMeans(n_clusters=2)
+    kmeans_model.fit(user1[['TowerLon', 'TowerLat']])
     centroids = kmeans_model.cluster_centers_
     print(centroids)
-    ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', c='r', alpha=0.5,
+    ax.scatter(centroids[:, 0], centroids[:, 1], marker='x', c='r', alpha=0.2,
                linewidths=3, s=169)
 #    showandtell('Centroids')
