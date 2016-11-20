@@ -53,7 +53,7 @@ def plotDecisionBoundary(model, X, y):
 
 
 #
-# TODO: Load up the dataset into a variable called X. Check the .head and
+# XXX: Load up the dataset into a variable called X. Check the .head and
 # compare it to the file you loaded in a text editor. Make sure you're
 # loading your data properly--don't fail on the 1st step!
 #
@@ -62,7 +62,7 @@ X = pd.read_csv('Datasets/wheat.data', index_col=0)
 
 
 #
-# TODO: Copy the 'wheat_type' series slice out of X, and into a series
+# XXX: Copy the 'wheat_type' series slice out of X, and into a series
 # called 'y'. Then drop the original 'wheat_type' column from the X
 #
 # .. your code here ..
@@ -70,23 +70,22 @@ y = X.wheat_type.copy()
 X = X.drop('wheat_type', axis=1)
 
 
-# TODO: Do a quick, "ordinal" conversion of 'y'. In actuality our
+# XXX: Do a quick, "ordinal" conversion of 'y'. In actuality our
 # classification isn't ordinal, but just as an experiment...
 #
 # .. your code here ..
-y = y.astype('category')
-y = y.cat.codes
+y = y.astype('category').cat.codes
 
 
 #
-# TODO: Basic nan munging. Fill each row's nans with the mean of the feature
+# XXX: Basic nan munging. Fill each row's nans with the mean of the feature
 #
 # .. your code here ..
 X.fillna(X.mean(), inplace=True)
 
 
 #
-# TODO: Split X into training and testing data sets using train_test_split().
+# XXX: Split X into training and testing data sets using train_test_split().
 # INFO: Use 0.33 test size, and use random_state=1. This is important
 # so that your answers are verifiable. In the real world, you wouldn't
 # specify a random_state.
@@ -97,7 +96,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33,
 
 
 #
-# TODO: Create an instance of SKLearn's Normalizer class and then train it
+# XXX: Create an instance of SKLearn's Normalizer class and then train it
 # using its .fit() method against your *training* data.
 #
 # NOTE: The reason you only fit against your training data is because in a
@@ -111,7 +110,7 @@ normalizer = Normalizer().fit(X_train)
 
 
 #
-# TODO: With your trained pre-processor, transform both your training AND
+# XXX: With your trained pre-processor, transform both your training AND
 # testing data.
 #
 # NOTE: Any testing data has to be transformed with your preprocessor
@@ -124,7 +123,7 @@ X_test = normalizer.transform(X_test)
 
 
 #
-# TODO: Just like your preprocessing transformation, create a PCA
+# XXX: Just like your preprocessing transformation, create a PCA
 # transformation as well. Fit it against your training data, and then
 # project your training and testing features into PCA space using the
 # PCA model's .transform() method.
@@ -139,14 +138,14 @@ X_test = pca.transform(X_test)
 
 
 #
-# TODO: Create and train a KNeighborsClassifier. Start with K=9 neighbors.
+# XXX: Create and train a KNeighborsClassifier. Start with K=9 neighbors.
 # NOTE: Be sure train your classifier against the pre-processed, PCA-
 # transformed training data above! You do not, of course, need to transform
 # your labels.
 #
 # .. your code here ..
 
-knn = KNeighborsClassifier(n_neighbors=1).fit(X_train, y_train)
+knn = KNeighborsClassifier(n_neighbors=9).fit(X_train, y_train)
 
 
 # HINT: Ensure your KNeighbors classifier object from earlier is called 'knn'
@@ -155,7 +154,7 @@ plotDecisionBoundary(knn, X_train, y_train)
 
 # ------------------------------------
 #
-# TODO: Display the accuracy score of your test data/labels, computed by
+# XXX: Display the accuracy score of your test data/labels, computed by
 # your KNeighbors model.
 #
 # NOTE: You do NOT have to run .predict before calling .score, since
