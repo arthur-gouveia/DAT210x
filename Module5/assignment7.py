@@ -1,73 +1,81 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import Normalizer
+from sklearn.decomposition import PCA
+from sklearn.neighbors import KNeighborsClassifier
+import matplotlib.pyplot as plt
 # If you'd like to try this lab with PCA instead of Isomap,
 # as the dimensionality reduction technique:
 Test_PCA = True
 
 
 def plotDecisionBoundary(model, X, y):
-  print "Plotting..."
-  import matplotlib.pyplot as plt
-  import matplotlib
-  matplotlib.style.use('ggplot') # Look Pretty
+    print("Plotting...")
+    import matplotlib
+    matplotlib.style.use('ggplot')  # Look Pretty
 
-  fig = plt.figure()
-  ax = fig.add_subplot(111)
+    fig = plt.figure()
+    fig.add_subplot(111)
 
-  padding = 0.1
-  resolution = 0.1
+    padding = 0.1
+    resolution = 0.1
 
-  #(2 for benign, 4 for malignant)
-  colors = {2:'royalblue',4:'lightsalmon'} 
+    # (2 for benign, 4 for malignant)
+    colors = {2: 'royalblue', 4: 'lightsalmon'}
 
-  
-  # Calculate the boundaris
-  x_min, x_max = X[:, 0].min(), X[:, 0].max()
-  y_min, y_max = X[:, 1].min(), X[:, 1].max()
-  x_range = x_max - x_min
-  y_range = y_max - y_min
-  x_min -= x_range * padding
-  y_min -= y_range * padding
-  x_max += x_range * padding
-  y_max += y_range * padding
+    # Calculate the boundaris
+    x_min, x_max = X[:, 0].min(), X[:, 0].max()
+    y_min, y_max = X[:, 1].min(), X[:, 1].max()
+    x_range = x_max - x_min
+    y_range = y_max - y_min
+    x_min -= x_range * padding
+    y_min -= y_range * padding
+    x_max += x_range * padding
+    y_max += y_range * padding
 
-  # Create a 2D Grid Matrix. The values stored in the matrix
-  # are the predictions of the class at at said location
-  import numpy as np
-  xx, yy = np.meshgrid(np.arange(x_min, x_max, resolution),
-                       np.arange(y_min, y_max, resolution))
+    # Create a 2D Grid Matrix. The values stored in the matrix
+    # are the predictions of the class at at said location
+    import numpy as np
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, resolution),
+                         np.arange(y_min, y_max, resolution))
 
-  # What class does the classifier say?
-  Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
-  Z = Z.reshape(xx.shape)
+    # What class does the classifier say?
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    Z = Z.reshape(xx.shape)
 
-  # Plot the contour map
-  plt.contourf(xx, yy, Z, cmap=plt.cm.seismic)
-  plt.axis('tight')
+    # Plot the contour map
+    plt.contourf(xx, yy, Z, cmap=plt.cm.seismic)
+    plt.axis('tight')
 
-  # Plot your testing points as well...
-  for label in np.unique(y):
-    indices = np.where(y == label)
-    plt.scatter(X[indices, 0], X[indices, 1], c=colors[label], alpha=0.8)
+    # Plot your testing points as well...
+    for label in np.unique(y):
+        indices = np.where(y == label)
+        plt.scatter(X[indices, 0], X[indices, 1], c=colors[label], alpha=0.8)
 
-  p = model.get_params()
-  plt.title('K = ' + str(p['n_neighbors']))
-  plt.show()
+    p = model.get_params()
+    plt.title('K = ' + str(p['n_neighbors']))
+    plt.show()
 
 
-# 
+#
 # TODO: Load in the dataset, identify nans, and set proper headers.
 # Be sure to verify the rows line up by looking at the file in a text editor.
 #
 # .. your code here ..
+df_columns = ['sample', 'thickness', 'size', 'shape', 'adhesion', 'epithelial',
+              'nuclei', 'chromatin', 'nucleoli', 'mitoses', 'status']
+df = pd.read_csv('Datasets/breast-cancer-wisconsin.data', index_col=0,
+                 names=df_columns, na_values='?')
+df.nuclei.fillna(0, inplace=True)
 
-
-
-# 
+#
 # TODO: Copy out the status column into a slice, then drop it from the main
 # dataframe. You can also drop the sample column, since that doesn't provide
 # us with any machine learning power.
 #
 # .. your code here ..
-
+status = df.status.copy()
+df.drop('status', axis=1, inplace=True)
 
 
 #
@@ -75,6 +83,46 @@ def plotDecisionBoundary(model, X, y):
 # with the mean feature / column value
 #
 # .. your code here ..
+# No missing values!
+# You could check with df.isnull.sum()
+
+# Checking data distribution
+df.hist()
+plt.figure()
+df.boxplot()
+
+#
+# TODO: Experiment with the basic SKLearn preprocessing scalers. We know that
+# the features consist of different units mixed in together, so it might be
+# reasonable to assume feature scaling is necessary. Print out a description
+# of the dataset, post transformation.
+#
+# .. your code here ..
+T = Normalizer().fit_transform(df)
+
+
+
+#
+# PCA and Isomap are your new best friends
+model = None
+if Test_PCA:
+    print("Computing 2D Principle Components")
+    #
+    # TODO: Implement PCA here. save your model into the variable 'model'.
+    # You should reduce down to two dimensions.
+    #
+    # .. your code here ..
+
+
+
+else:
+    print("Computing 2D Isomap Manifold")
+    #
+    # TODO: Implement Isomap here. save your model into the variable 'model'
+    # Experiment with K values from 5-10.
+    # You should reduce down to two dimensions.
+    #
+    # .. your code here ..
 
 
 
@@ -84,44 +132,8 @@ def plotDecisionBoundary(model, X, y):
 # the test_size at 0.5 (50%).
 #
 # .. your code here ..
-
-
-
-
-#
-# TODO: Experiment with the basic SKLearn preprocessing scalers. We know that
-# the features consist of different units mixed in together, so it might be
-# reasonable to assume feature scaling is necessary. Print out a description
-# of the dataset, post transformation.
-#
-# .. your code here ..
-
-
-
-
-#
-# PCA and Isomap are your new best friends
-model = None
-if Test_PCA:
-  print "Computing 2D Principle Components"
-  #
-  # TODO: Implement PCA here. save your model into the variable 'model'.
-  # You should reduce down to two dimensions.
-  #
-  # .. your code here ..
-
-  
-
-else:
-  print "Computing 2D Isomap Manifold"
-  #
-  # TODO: Implement Isomap here. save your model into the variable 'model'
-  # Experiment with K values from 5-10.
-  # You should reduce down to two dimensions.
-  #
-  # .. your code here ..
-  
-
+X_train, X_test, y_train, y_test = train_test_split(df, status, test_size=0.5,
+                                                    random_state=7)
 
 
 #
@@ -133,7 +145,7 @@ else:
 
 
 
-# 
+#
 # TODO: Implement and train KNeighborsClassifier on your projected 2D
 # training data here. You can use any K value from 1 - 15, so play around
 # with it and see what results you can come up. Your goal is to find a
