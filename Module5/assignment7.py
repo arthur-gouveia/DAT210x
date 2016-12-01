@@ -1,9 +1,10 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import Normalizer
+# from sklearn import preprocessing as skpre
 from sklearn.decomposition import PCA
 from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
+from sklearn.manifold import Isomap
 # If you'd like to try this lab with PCA instead of Isomap,
 # as the dimensionality reduction technique:
 Test_PCA = True
@@ -79,17 +80,17 @@ df.drop('status', axis=1, inplace=True)
 
 
 #
-# TODO: With the labels safely extracted from the dataset, replace any nan values
-# with the mean feature / column value
+# TODO: With the labels safely extracted from the dataset, replace any nan
+# values with the mean feature / column value
 #
 # .. your code here ..
 # No missing values!
 # You could check with df.isnull.sum()
 
 # Checking data distribution
-df.hist()
-plt.figure()
-df.boxplot()
+# df.hist()
+# plt.figure()
+# df.boxplot()
 
 #
 # TODO: Experiment with the basic SKLearn preprocessing scalers. We know that
@@ -98,9 +99,10 @@ df.boxplot()
 # of the dataset, post transformation.
 #
 # .. your code here ..
-T = Normalizer().fit_transform(df)
-
-
+# Normalizer()
+# MinMaxScaler()
+# RobustScaler()
+# df = skpre.RobustScaler().fit_transform(df)
 
 #
 # PCA and Isomap are your new best friends
@@ -112,7 +114,7 @@ if Test_PCA:
     # You should reduce down to two dimensions.
     #
     # .. your code here ..
-
+    model = PCA(2)
 
 
 else:
@@ -123,13 +125,12 @@ else:
     # You should reduce down to two dimensions.
     #
     # .. your code here ..
-
-
+    model = Isomap(n_neighbors=6, n_components=2)
 
 #
-# TODO: Do train_test_split. Use the same variable names as on the EdX platform in
-# the reading material, but set the random_state=7 for reproduceability, and keep
-# the test_size at 0.5 (50%).
+# TODO: Do train_test_split. Use the same variable names as on the EdX platform
+# in the reading material, but set the random_state=7 for reproduceability, and
+# keep the test_size at 0.5 (50%).
 #
 # .. your code here ..
 X_train, X_test, y_train, y_test = train_test_split(df, status, test_size=0.5,
@@ -142,7 +143,9 @@ X_train, X_test, y_train, y_test = train_test_split(df, status, test_size=0.5,
 # back into the variables themselves.
 #
 # .. your code here ..
-
+model.fit(X_train)
+X_train = model.transform(X_train)
+X_test = model.transform(X_test)
 
 
 #
@@ -154,25 +157,38 @@ X_train, X_test, y_train, y_test = train_test_split(df, status, test_size=0.5,
 # parameter affects the results.
 #
 # .. your code here ..
+max_score = 0
+best_k = 0
+best_weight = ''
+score = 0
 
+for k in range(1, 15):
+    for weight in ['uniform', 'distance']:
+        knmodel = KNeighborsClassifier(n_neighbors=k,
+                                       weights=weight).fit(X_train, y_train)
+        score = knmodel.score(X_test, y_test)
+        if score > max_score:
+            best_k = k
+            best_weight = weight
+            max_score = score
 
-
+knmodel = KNeighborsClassifier(n_neighbors=best_k,
+                               weights=best_weight).fit(X_train, y_train)
 #
 # INFO: Be sure to always keep the domain of the problem in mind! It's
 # WAY more important to errantly classify a benign tumor as malignant,
 # and have it removed, than to incorrectly leave a malignant tumor, believing
-# it to be benign, and then having the patient progress in cancer. Since the UDF
-# weights don't give you any class information, the only way to introduce this
-# data into SKLearn's KNN Classifier is by "baking" it into your data. For
+# it to be benign, and then having the patient progress in cancer. Since the
+# UDF weights don't give you any class information, the only way to introduce
+# this data into SKLearn's KNN Classifier is by "baking" it into your data. For
 # example, randomly reducing the ratio of benign samples compared to malignant
 # samples from the training set.
-
-
 
 #
 # TODO: Calculate + Print the accuracy of the testing set
 #
 # .. your code here ..
 
-
+print('Best k: {}\nBest weight: {}\nBest score: {:.4f}%'.format(
+      best_k, best_weight, max_score*100))
 plotDecisionBoundary(knmodel, X_test, y_test)
