@@ -9,60 +9,61 @@ matplotlib.style.use('ggplot') # Look Pretty
 
 
 def drawLine(model, X_test, y_test, title, R2):
-  # This convenience method will take care of plotting your
-  # test observations, comparing them to the regression line,
-  # and displaying the R2 coefficient
-  fig = plt.figure()
-  ax = fig.add_subplot(111)
-  ax.scatter(X_test, y_test, c='g', marker='o')
-  ax.plot(X_test, model.predict(X_test), color='orange', linewidth=1, alpha=0.7)
+    # This convenience method will take care of plotting your
+    # test observations, comparing them to the regression line,
+    # and displaying the R2 coefficient
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(X_test, y_test, c='g', marker='o')
+    ax.plot(X_test, model.predict(X_test), color='orange',
+            linewidth=1, alpha=0.7)
 
-  title += " R2: " + str(R2)
-  ax.set_title(title)
-  print title
-  print "Intercept(s): ", model.intercept_
+    title += " R2: " + str(R2)
+    ax.set_title(title)
+    print(title)
+    print("Intercept(s): ", model.intercept_)
 
-  plt.show()
+    plt.show()
+
 
 def drawPlane(model, X_test, y_test, title, R2):
-  # This convenience method will take care of plotting your
-  # test observations, comparing them to the regression plane,
-  # and displaying the R2 coefficient
-  fig = plt.figure()
-  ax = Axes3D(fig)
-  ax.set_zlabel('prediction')
+    # This convenience method will take care of plotting your
+    # test observations, comparing them to the regression plane,
+    # and displaying the R2 coefficient
+    fig = plt.figure()
+    ax = Axes3D(fig)
+    ax.set_zlabel('prediction')
 
-  # You might have passed in a DataFrame, a Series (slice),
-  # an NDArray, or a Python List... so let's keep it simple:
-  X_test = np.array(X_test)
-  col1 = X_test[:,0]
-  col2 = X_test[:,1]
+    # You might have passed in a DataFrame, a Series (slice),
+    # an NDArray, or a Python List... so let's keep it simple:
+    X_test = np.array(X_test)
+    col1 = X_test[:, 0]
+    col2 = X_test[:, 1]
 
-  # Set up a Grid. We could have predicted on the actual
-  # col1, col2 values directly; but that would have generated
-  # a mesh with WAY too fine a grid, which would have detracted
-  # from the visualization
-  x_min, x_max = col1.min(), col1.max()
-  y_min, y_max = col2.min(), col2.max()
-  x = np.arange(x_min, x_max, (x_max-x_min) / 10)
-  y = np.arange(y_min, y_max, (y_max-y_min) / 10)
-  x, y = np.meshgrid(x, y)
+    # Set up a Grid. We could have predicted on the actual
+    # col1, col2 values directly; but that would have generated
+    # a mesh with WAY too fine a grid, which would have detracted
+    # from the visualization
+    x_min, x_max = col1.min(), col1.max()
+    y_min, y_max = col2.min(), col2.max()
+    x = np.arange(x_min, x_max, (x_max-x_min) / 10)
+    y = np.arange(y_min, y_max, (y_max-y_min) / 10)
+    x, y = np.meshgrid(x, y)
 
-  # Predict based on possible input values that span the domain
-  # of the x and y inputs:
-  z = model.predict(  np.c_[x.ravel(), y.ravel()]  )
-  z = z.reshape(x.shape)
+    # Predict based on possible input values that span the domain
+    # of the x and y inputs:
+    z = model.predict(np.c_[x.ravel(), y.ravel()])
+    z = z.reshape(x.shape)
 
-  ax.scatter(col1, col2, y_test, c='g', marker='o')
-  ax.plot_wireframe(x, y, z, color='orange', alpha=0.7)
-  
-  title += " R2: " + str(R2)
-  ax.set_title(title)
-  print title
-  print "Intercept(s): ", model.intercept_
-  
-  plt.show()
-  
+    ax.scatter(col1, col2, y_test, c='g', marker='o')
+    ax.plot_wireframe(x, y, z, color='orange', alpha=0.7)
+
+    title += " R2: " + str(R2)
+    ax.set_title(title)
+    print(title)
+    print("Intercept(s): ", model.intercept_)
+
+    plt.show()
 
 
 #
